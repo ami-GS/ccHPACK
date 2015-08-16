@@ -5,6 +5,8 @@
 #include <utility>
 #include <string>
 
+typedef std::pair<std::string, std::string> header;
+
 struct RingTable {
     std::pair<std::string, std::string> header;
     RingTable *nxt, *pre;
