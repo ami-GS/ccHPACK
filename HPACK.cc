@@ -1,5 +1,4 @@
 #include <stdint.h>
-#include <utility> // for pair
 #include <vector>
 #include <string>
 #include "HPACK.h"
@@ -45,10 +44,10 @@ uint64_t decode_int(uint32_t &I, uint8_t* buf, uint8_t N) {
     return buf - start + 1;
 }
 
-std::vector< std::pair<std::string, std::string> >
+std::vector< header >
 hpack_decode(uint8_t* buf, Table* table) {
     uint32_t loc = 0;
-    std::vector< std::pair<std::string, std::string> > headers;
+    std::vector< header > headers;
     while (*buf != '\0') {
         bool isIndexed = 0;
         bool isIncremental = 0;
@@ -81,12 +80,12 @@ hpack_decode(uint8_t* buf, Table* table) {
             }
         }
         //buf += l;
-        std::pair<std::string, std::string> header;// = table->parse_header(index, buf, isIndexed);
+        header h = table->parse_header(index, buf, isIndexed);
         //buf += l;
         if (isIncremental) {
             //table.AddHeader(dst);
         }
-        headers.push_back(header);
+        headers.push_back(h);
 
     }
     return headers;
