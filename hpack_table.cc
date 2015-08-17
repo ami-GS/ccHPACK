@@ -1,4 +1,5 @@
 #include <string>
+#include "HPACK.h"
 #include "hpack_table.h"
 
 
@@ -78,9 +79,18 @@ Table::get_header(uint32_t index) {
     return h;
 }
 
-std::string // temporally
-Table::parse_string(uint8_t* buf) {
-    return "";
+uint32_t // temporally
+Table::parse_string(std::string& content, uint8_t* buf) {
+    uint32_t dst;
+    uint64_t l = decode_int(dst, buf, 7);
+    if ((*buf & 0x80) > 0) {
+        content = "";// huffman decoding
+    } else {
+        for (int i = 0; i < dst; i++) {
+            content += (char)(*(buf++));
+        }
+    }
+    return l;
 }
 
 header
@@ -88,10 +98,11 @@ Table::parse_header(uint32_t index, uint8_t* buf, bool isIndexed) {
     header h;
     std::string val_tmp;
     if (!isIndexed) {
+        // l is used temporally
         if (index == 0) {
-            h.first = this->parse_string(buf); //temporally
+            uint64_t l = this->parse_string(h.first, buf);
         }
-        val_tmp = this->parse_string(buf); //temporally
+        uint64_t l = this->parse_string(val_tmp, buf);
     }
     
     if (index > 0) {
