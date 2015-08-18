@@ -68,6 +68,8 @@ static const header STATIC_TABLE[] = {
     header("www-authenticate", "")
 };
 
+static const uint8_t STATIC_TABLE_NUM = 62;
+
 void
 Table::set_dynamic_table_size(uint32_t size) {
     dynamic_table_size = size;
@@ -75,7 +77,16 @@ Table::set_dynamic_table_size(uint32_t size) {
 
 header // temporally
 Table::get_header(uint32_t index) {
-    header h;
+    if (0 < index && index < STATIC_TABLE_NUM) {
+        return STATIC_TABLE[index];
+    } else if (STATIC_TABLE_NUM <= index && index <= STATIC_TABLE_NUM + entry_num) {
+        RingTable* ring = head;
+        for (int i = 0; i < index-STATIC_TABLE_NUM; i++) {
+            ring = ring->nxt;
+        }
+        return ring->h;
+    }
+    header h; // temporally
     return h;
 }
 
