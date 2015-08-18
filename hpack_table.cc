@@ -75,6 +75,36 @@ Table::set_dynamic_table_size(uint32_t size) {
     dynamic_table_size = size;
 }
 
+void
+Table::delete_last_entry() {
+    entry_size -= tail->h.first.length() + tail->h.second.length();
+    RingTable* tmp = tail;
+    tail = tail->pre;
+    delete tmp;
+    entry_num--;
+}
+
+void
+Table::add_header(header h) {
+    uint32_t size = h.first.length() + h.second.length();
+    while (entry_size + size > dynamic_table_size) {
+        this->delete_last_entry();
+    }
+    RingTable* elem = new RingTable;
+    elem->h = h;
+    if (entry_num >= 1) {
+	(*elem).nxt = head;
+        head->pre = elem;
+    }
+    head = elem;
+
+    if (entry_num == 0) {
+        tail = elem;
+    }
+    entry_num++;
+    entry_size += size;
+}
+
 header // temporally
 Table::get_header(uint32_t index) {
     if (0 < index && index < STATIC_TABLE_NUM) {
