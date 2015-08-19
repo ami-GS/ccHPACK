@@ -75,6 +75,43 @@ Table::set_dynamic_table_size(uint32_t size) {
     dynamic_table_size = size;
 }
 
+bool
+Table::find_header(int &index, header h) {
+    std::string tmpName;
+    bool match;
+    for (int i = 0; i < STATIC_TABLE_NUM; i++) {
+        header s_header = STATIC_TABLE[i];
+        if (s_header.first == h.first && s_header.second == h.second) {
+            index = i;
+            return true;
+        } else if (s_header.first == h.first && index == 0) {
+            tmpName = s_header.first;
+            index = i;
+            match = false;
+        } else if (index != 0 && tmpName != s_header.first) {
+            return match;
+        }
+    }
+
+    RingTable* ring = head;
+    for (int i = 0; i < entry_num; i++) {
+        if (ring->h.first == h.first && ring->h.second == h.second) {
+            index = i + STATIC_TABLE_NUM;
+            return true;
+        } else if (ring->h.first == h.first && index == 0) {
+            match = false;
+            index = i + STATIC_TABLE_NUM;
+        }
+        ring = ring->nxt;
+    }
+    if (index > 0) {
+        return match;
+    } else {
+        index = -1;
+        return false;
+    }
+}
+
 void
 Table::delete_last_entry() {
     entry_size -= tail->h.first.length() + tail->h.second.length();

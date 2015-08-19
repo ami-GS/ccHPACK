@@ -20,6 +20,7 @@ class Table {
 public:
     Table(): entry_size(0), entry_num(0), dynamic_table_size(4096) {};
     ~Table() {};
+    bool find_header(int &index, header h);
     void delete_last_entry();
     void add_header(header h);
     void set_dynamic_table_size(uint32_t size);
