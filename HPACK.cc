@@ -57,7 +57,7 @@ hpack_decode(uint8_t* buf, Table* table) {
             // 7/3 Header table Size Update
             uint32_t dst = 0;
             l = decode_int(++dst, buf, 5);
-            //table->set_dynamic_table_size(dst);
+            table->set_dynamic_table_size(dst);
             //buf += l;
         }
 
@@ -83,10 +83,9 @@ hpack_decode(uint8_t* buf, Table* table) {
         header h = table->parse_header(index, buf, isIndexed);
         //buf += l;
         if (isIncremental) {
-            //table.AddHeader(dst);
+            table->add_header(h);
         }
         headers.push_back(h);
-
     }
     return headers;
 }
