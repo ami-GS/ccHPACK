@@ -5,7 +5,7 @@
 
 typedef struct {
     uint32_t code;
-    uint8_t bitlen;
+    uint8_t bitLen;
 } huffman_code;
 
 struct Node {
