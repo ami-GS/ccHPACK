@@ -260,3 +260,29 @@ static const huffman_code HUFFMAN_TABLE[] = {
 	{0x3ffffee, 26},
 	{0x3fffffff, 30}
 };
+
+static const uint16_t HUFFMAN_TABLE_LEN = 257;
+
+HuffmanTree::HuffmanTree() {
+    root = new Node(NULL_NODE, NULL_NODE, 0xffffffff);
+    for (uint32_t code = 0; code < HUFFMAN_TABLE_LEN; code++) {
+        Node* cursor = root;
+        huffman_code huff = HUFFMAN_TABLE[code];
+        for (int i = huff.bitLen; i > 0; i--) {
+            if ((huff.code & (1 << (i-1))) > 0) {
+                if (cursor->right == NULL_NODE) {
+                        cursor->right = new Node(NULL_NODE, NULL_NODE, 0xffffffff);
+                    }
+                cursor = cursor->right;
+            } else {
+                if (cursor->left == NULL_NODE) {
+                        cursor->left = new Node(NULL_NODE, NULL_NODE, 0xffffffff);
+                    }
+                cursor = cursor->left;
+            }
+        }
+        cursor->code = code;
+    }
+}
+
+HuffmanTree::~HuffmanTree() {}
