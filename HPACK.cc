@@ -33,7 +33,39 @@ encode_int(uint8_t* &dst, uint32_t I, uint8_t N) {
 
 int64_t
 hpack_encode(uint8_t* buf, std::vector<header> headers, bool from_sTable, bool from_dTable, bool is_huffman, Table* table, int dynamic_table_size) {
+    uint16_t len;
+    uint8_t* d_table_size;
     if (dynamic_table_size != -1) {
+        len = encode_int(d_table_size, dynamic_table_size, 5);
+        *d_table_size |= 0x20;
+        //delete d_table_size;
+    }
+    for (header h : headers) {
+        int index;
+        bool match = table->find_header(index, h);
+        if (from_sTable && match) {
+            uint8_t index_len = 8;
+            uint8_t mask = 0;
+            uint8_t* content;
+            if (from_dTable) {
+                index_len = 7;
+                mask = 0x80;
+            } else {
+                content = table->pack_string(h.second, is_huffman); // temporally
+            }
+            uint8_t* intRep;
+            len = encode_int(intRep, index, index_len);
+            *intRep |= mask;
+            // append gub and intRep
+        } else if (from_sTable && !match && index > 0) {
+            uint8_t index_len = 4;
+            uint8_t mask = 0;
+            if (from_dTable) {
+                index_len = 6;
+                mask = 0x40;
+                table->add_header(h);
+            }
+        }
     }
     return 0;
 }
