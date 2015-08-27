@@ -19,6 +19,7 @@ struct Node {
 
 class HuffmanTree {
     Node* root;
+    void delete_node(Node* node);
 public:
     HuffmanTree();
     ~HuffmanTree(); // delete alocated tree

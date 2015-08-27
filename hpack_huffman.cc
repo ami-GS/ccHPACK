@@ -285,7 +285,27 @@ HuffmanTree::HuffmanTree() {
     }
 }
 
-HuffmanTree::~HuffmanTree() {}
+void HuffmanTree::delete_node(Node* node) {
+    if (node->right != NULL_NODE) {
+        delete_node(node->right);
+    }
+    if (node->left != NULL_NODE) {
+        delete_node(node->left);
+    }
+
+    if (node->left == NULL_NODE && node->right == NULL_NODE) {
+        delete node;
+        node = NULL_NODE;
+    }
+
+    return;
+}
+
+HuffmanTree::~HuffmanTree() {
+    delete_node(root);
+}
+
+
 uint16_t
 HuffmanTree::encode(uint8_t* &dst, std::string content) {
     uint8_t *stringTmp = new uint8_t[content.length()+1];
