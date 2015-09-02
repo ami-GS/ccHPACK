@@ -349,3 +349,23 @@ HuffmanTree::encode(uint8_t* &dst, std::string content) {
     delete [] stringTmp;
     return len;
 }
+
+std::string
+HuffmanTree::decode(uint8_t* buf, uint32_t len) {
+    std::string content;
+    Node* cursor = root;
+    for (int i = 0; i < len; i++) {
+       for (uint8_t j = 7; j >= 0; j--) {
+           if ((*(buf++) & (1 << j)) > 0) {
+                cursor = cursor->right;
+            } else {
+                cursor = cursor->left;
+            }
+            if (cursor->code < 0xffffffff) {
+                content += cursor->code; // correct?
+                cursor = root;
+            }
+        }
+    }
+    return content;
+}
