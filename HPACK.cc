@@ -90,7 +90,6 @@ hpack_decode(uint8_t* buf, Table* table) {
     std::vector< header > headers;
     while (*buf != '\0') {
         bool isIndexed = 0;
-        bool isIncremental = 0;
         uint32_t index;
         if ((*buf & 0xe0) == 0x20) {
             // 7/3 Header table Size Update
@@ -98,28 +97,29 @@ hpack_decode(uint8_t* buf, Table* table) {
             table->set_dynamic_table_size(dst);
         }
 
+        uint8_t nLen = 0;
         if ((*buf & 0x80) > 0)  {
             // 7.1 Indexwd Header Field
             if ((*buf & 0x7f) == 0) {
                 // error
             }
-            l = decode_int(index, ++buf, 7);
+            nLen = 7;
             isIndexed = true;
         } else {
             if ((*buf & 0xc0) == 0x40) {
                 // 7.2.1 Literal Header Field with Incremental Indexing
-                l = decode_int(index, ++buf, 6);
-                isIncremental = true;
-            } else if ((*buf & 0xf0) == 0xf0) {
-                l = decode_int(index, ++buf, 4);
+                nLen = 6;
             } else {
-                l = decode_int(index, ++buf, 4);
+                // when buf[cursor]&0xf0 == 0xf0
+                // 7.2.2 Literal Header Field without Indexing
+                // else
+                // 7.2.3 Literal Header Field never Indexed
+                nLen = 4;
             }
         }
         index = decode_int(++buf, nLen);
         header h = table->parse_header(index, buf, isIndexed);
-        //buf += l;
-        if (isIncremental) {
+        if (nLen == 6) {
             table->add_header(h);
         }
         headers.push_back(h);
