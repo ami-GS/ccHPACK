@@ -24,7 +24,7 @@ public:
     void delete_last_entry();
     void add_header(header h);
     void set_dynamic_table_size(uint32_t size);
-    uint32_t parse_string(std::string& content, uint8_t* buf);
+    std::string parse_string(uint8_t* buf);
     header get_header(uint32_t index);
     header parse_header(uint32_t index, uint8_t* buf, bool isIndexed);
 };

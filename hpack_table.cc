@@ -157,10 +157,10 @@ Table::get_header(uint32_t index) {
     return h;
 }
 
-uint32_t // temporally
-Table::parse_string(std::string& content, uint8_t* buf) {
-    uint32_t dst;
-    uint64_t l = decode_int(dst, buf, 7);
+std::string
+Table::parse_string(uint8_t* buf) {
+    std::string content;
+    uint32_t dst = decode_int(buf, 7);
     if ((*buf & 0x80) > 0) {
         content = "";// huffman decoding
     } else {
@@ -168,7 +168,7 @@ Table::parse_string(std::string& content, uint8_t* buf) {
             content += (char)(*(buf++));
         }
     }
-    return l;
+    return content;
 }
 
 header
@@ -176,11 +176,10 @@ Table::parse_header(uint32_t index, uint8_t* buf, bool isIndexed) {
     header h;
     std::string val_tmp;
     if (!isIndexed) {
-        // l is used temporally
         if (index == 0) {
-            uint64_t l = this->parse_string(h.first, buf);
+            h.first = this->parse_string(buf);
         }
-        uint64_t l = this->parse_string(val_tmp, buf);
+        val_tmp = this->parse_string(buf);
     }
     
     if (index > 0) {

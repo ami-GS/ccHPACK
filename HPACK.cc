@@ -71,10 +71,9 @@ hpack_encode(uint8_t* buf, std::vector<header> headers, bool from_sTable, bool f
 }
 
 
-
-uint64_t decode_int(uint32_t &I, uint8_t* buf, uint8_t N) {
-    uint8_t* start = buf;
-    I = *buf & ((1 << N) - 1);
+uint32_t
+decode_int(uint8_t* buf, uint8_t N) {
+    uint32_t I = *buf & ((1 << N) - 1);
     if (I == (1 << N) -1) {
         int M = 0;
         do {
@@ -83,24 +82,20 @@ uint64_t decode_int(uint32_t &I, uint8_t* buf, uint8_t N) {
         }
         while (*buf & 0x80);
     }
-    return buf - start + 1;
+    return I;
 }
 
 std::vector< header >
 hpack_decode(uint8_t* buf, Table* table) {
-    uint32_t loc = 0;
     std::vector< header > headers;
     while (*buf != '\0') {
         bool isIndexed = 0;
         bool isIncremental = 0;
         uint32_t index;
-        uint64_t l = 0;
         if ((*buf & 0xe0) == 0x20) {
             // 7/3 Header table Size Update
-            uint32_t dst = 0;
-            l = decode_int(++dst, buf, 5);
+            uint32_t dst = decode_int(buf, 5);
             table->set_dynamic_table_size(dst);
-            //buf += l;
         }
 
         if ((*buf & 0x80) > 0)  {
@@ -121,7 +116,7 @@ hpack_decode(uint8_t* buf, Table* table) {
                 l = decode_int(index, ++buf, 4);
             }
         }
-        //buf += l;
+        index = decode_int(++buf, nLen);
         header h = table->parse_header(index, buf, isIndexed);
         //buf += l;
         if (isIncremental) {
@@ -131,4 +126,3 @@ hpack_decode(uint8_t* buf, Table* table) {
     }
     return headers;
 }
-
