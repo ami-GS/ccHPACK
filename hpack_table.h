@@ -25,6 +25,7 @@ public:
     void add_header(header h);
     void set_dynamic_table_size(uint32_t size);
     std::string parse_string(uint8_t* buf);
+    uint8_t* pack_string(std::string content, bool to_huffman);
     header get_header(uint32_t index);
     header parse_header(uint32_t index, uint8_t* buf, bool isIndexed);
 };
