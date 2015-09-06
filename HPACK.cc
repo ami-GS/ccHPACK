@@ -4,67 +4,75 @@
 #include "HPACK.h"
 #include "hpack_table.h"
 
-uint16_t
-encode_int(uint8_t* &dst, uint32_t I, uint8_t N) {
+int64_t
+encode_int(uint8_t* dst, uint32_t I, uint8_t N) {
     if (I < (1 << N)-1) {
-        dst = new uint8_t[1];
         *dst = I;
         return 1;
     }
 
     I -= (1 << N)-1;
-    uint16_t i;
-    uint32_t tmpI = I;
-    for (i = 1; tmpI >= 128; i++) {
-        tmpI = tmpI >> 7;
-    } // check length
-    
-    dst = new uint8_t[i+1];
     *dst =  (1 << N) - 1;
-    uint8_t j = 1;
-    for (; I >= 128; j++) {
-        *(dst+j) = (I & 0x7f) | 0x80;
+    uint64_t i = 1;
+    for (; I >= 128; i++) {
+        *(dst+i) = (I & 0x7f) | 0x80;
         I = I >> 7;
     }
-    *(dst+j) = I;
+    *(dst+(i++)) = I;
 
-    return i+1;
+    return i;
 }
 
 int64_t
 hpack_encode(uint8_t* buf, std::vector<header> headers, bool from_sTable, bool from_dTable, bool is_huffman, Table* table, int dynamic_table_size) {
-    uint16_t len;
-    uint8_t* d_table_size;
+    uint64_t len;
+    uint8_t d_table_size[100];
+    uint8_t intRep[100];
     if (dynamic_table_size != -1) {
         len = encode_int(d_table_size, dynamic_table_size, 5);
         *d_table_size |= 0x20;
-        //delete d_table_size;
+        // memcopy
+        buf += len;
     }
     for (header h : headers) {
         int index;
         bool match = table->find_header(index, h);
         if (from_sTable && match) {
-            uint8_t index_len = 8;
-            uint8_t mask = 0;
-            uint8_t* content;
             if (from_dTable) {
-                index_len = 7;
-                mask = 0x80;
+                len = encode_int(intRep, index, 7);
+                *intRep |= 0x80;
+                // memcopy
             } else {
-                content = table->pack_string(h.second, is_huffman); // temporally
+                len = encode_int(intRep, index, 4);
+                // memcopy
+                buf += len;
+                len = table->pack_string(buf, h.second, is_huffman);
+                buf += len;
             }
-            uint8_t* intRep;
-            len = encode_int(intRep, index, index_len);
-            *intRep |= mask;
-            // append gub and intRep
         } else if (from_sTable && !match && index > 0) {
-            uint8_t index_len = 4;
-            uint8_t mask = 0;
             if (from_dTable) {
-                index_len = 6;
-                mask = 0x40;
+                len = encode_int(intRep, index, 6);
+                *intRep |= 0x40;
+                // memcopy
+                table->add_header(h);
+            } else {
+                len = encode_int(intRep, index, 4);
+                // memcopy
+                buf += len;
+                len = table->pack_string(buf, h.second, is_huffman);
+                buf += len;
+            }
+        } else {
+            uint8_t prefix = 0x00; // if buf is initialized by ZERO, no need.
+            if (from_dTable) {
+                prefix = 0x40;
                 table->add_header(h);
             }
+            *(buf++) = prefix;
+            len = table->pack_string(buf, h.first, is_huffman);
+            buf += len;
+            len = table->pack_string(buf, h.second, is_huffman);
+            buf += len;
         }
     }
     return 0;
