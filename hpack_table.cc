@@ -171,38 +171,35 @@ Table::parse_string(uint8_t* buf) {
     return content;
 }
 
-uint8_t* // temporally
-Table::pack_string(std::string content, bool to_huffman) {
-    uint8_t* dst;
+int64_t
+Table::pack_string(uint8_t* buf, std::string content, bool to_huffman) {
     if (content.length() == 0) {
-            dst = new uint8_t[1];
             if (to_huffman) {
-                *dst = 0x80;
+                *buf = 0x80;
             } else {
-                *dst = 0x00;
+                *buf = 0x00;
             }
-            return dst;
+            return 1;
         }
 
-    uint8_t* int_rep;
-    uint16_t len;
+    uint8_t intRep[100];
+    int64_t len;
     if (to_huffman) {
-        // length = huffman_encode(encoded, content);
-        len = encode_int(int_rep, 1, 7); // the 1 is temporally
-        int_rep -= len-1;
-        *int_rep |= 0x80;
-        // dst = new uint8_t[LENGTH????];
-        // memcopy(dst, int_rep, int_rep.len);
-        // dst += int_rep.len;
-        // memcopy(dst, encoded, encoded_len);
+        // int64_t length = huffman_encode(encoded, content);
+        // len = encode_int(intRep, length, 7);
+        intRep[0] |= 0x80;
+        // memcopy
+        buf += len;
+        // memcopy
+        //buf += length;
     } else {
-        len = encode_int(int_rep, content.length(), 7);
-        // dst = new uint8_t[LENGTH????];
-        // memcopy(dst, int_rep, int_rep.len);
-        // dst += int_rep.len;
-        // memcopy(dst, content, content.length());
+        len = encode_int(intRep, content.length(), 7);
+        buf += len;
+        // memcopy
+        len += content.length();
+        buf += content.length();
     }
-    return dst;
+    return len;
 }
 
 
