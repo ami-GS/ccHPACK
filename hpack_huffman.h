@@ -23,7 +23,7 @@ class HuffmanTree {
 public:
     HuffmanTree();
     ~HuffmanTree(); // delete alocated tree
-    uint16_t encode(uint8_t* &dst, std::string content);
+    int64_t encode(uint8_t* buf, std::string content);
     std::string decode(uint8_t* buf, uint32_t len);
 };
 

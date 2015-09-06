@@ -306,44 +306,44 @@ HuffmanTree::~HuffmanTree() {
 }
 
 
-uint16_t
-HuffmanTree::encode(uint8_t* &dst, std::string content) {
+int64_t
+HuffmanTree::encode(uint8_t* buf, std::string content) {
     uint8_t *stringTmp = new uint8_t[content.length()+1];
     strcpy(stringTmp, content.c_str()); // danger?
+
     std::vector<uint8_t> buftmp; // vector has len or size?
-    uint16_t len = 0;
-    uint8_t buf = 0;
+    uint64_t len = 0;
+    uint8_t tmp = 0;
     uint8_t bufRest = 8;
     for (int i = 0; i < content.length(); i++) {
         huffman_code huff = HUFFMAN_TABLE[stringTmp[i]];
         while (huff.bitLen > 0) {
             if (huff.bitLen < bufRest) {
                 bufRest -= huff.bitLen;
-                buf |= (uint8_t)(huff.code << bufRest);
+                tmp |= (uint8_t)(huff.code << bufRest);
                 huff.bitLen = 0;
             } else {
                 uint8_t shift = huff.bitLen-bufRest;
-                buf |= (uint8_t)(huff.code >> shift);
+                tmp |= (uint8_t)(huff.code >> shift);
                 huff.bitLen -= bufRest;
                 bufRest = 0;
                 huff.code = huff.code & ((1 << shift) - 1);
             }
             if (bufRest == 0) {
                 len++;
-                buftmp.push_back(buf);
+                buftmp.push_back(tmp);
                 bufRest = 8;
-                buf = 0;
+                tmp = 0;
             }
         }
     }
     if (bufRest > 0 && bufRest > 8) {
-        buf |= ((1 << bufRest) - 1);
-        buftmp.push_back(buf);
+        tmp |= ((1 << bufRest) - 1);
+        buftmp.push_back(tmp);
         len++;
     }
-    dst = new uint8_t[len];
     for (int i = 0; i < len; i++) { // I would like to use extended for
-        *(dst+i) = buftmp[i];
+        *(buf+i) = buftmp[i];
     }
 
     delete [] stringTmp;
