@@ -177,14 +177,6 @@ Table::parse_string(uint8_t* buf) {
 
 int64_t
 Table::pack_string(uint8_t* buf, std::string content, bool to_huffman) {
-    if (content.length() == 0) {
-            if (to_huffman) {
-                *buf = 0x80;
-            } else {
-                *buf = 0x00;
-            }
-            return 1;
-        }
     int64_t length;
     uint8_t mask = 0;
     uint8_t encoded[100];
