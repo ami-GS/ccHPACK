@@ -70,6 +70,10 @@ static const header STATIC_TABLE[] = {
 
 static const uint8_t STATIC_TABLE_NUM = 62;
 
+Table::~Table() {
+    delete this->huffman;
+}
+
 void
 Table::set_dynamic_table_size(uint32_t size) {
     dynamic_table_size = size;
