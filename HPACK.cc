@@ -25,14 +25,15 @@ encode_int(uint8_t* dst, uint32_t I, uint8_t N) {
 
 int64_t
 hpack_encode(uint8_t* buf, std::vector<header> headers, bool from_sTable, bool from_dTable, bool is_huffman, Table* table, int dynamic_table_size) {
-    uint64_t len;
-    uint8_t d_table_size[100];
+    int64_t len;
+    int64_t cursor;
     uint8_t intRep[100];
     if (dynamic_table_size != -1) {
+        uint8_t d_table_size[100];
         len = encode_int(d_table_size, dynamic_table_size, 5);
         *d_table_size |= 0x20;
         // memcopy
-        buf += len;
+        cursor += len;
     }
     for (header h : headers) {
         int index;
@@ -45,9 +46,8 @@ hpack_encode(uint8_t* buf, std::vector<header> headers, bool from_sTable, bool f
             } else {
                 len = encode_int(intRep, index, 4);
                 // memcopy
-                buf += len;
-                len = table->pack_string(buf, h.second, is_huffman);
-                buf += len;
+                cursor += len;
+                len = table->pack_string(buf+cursor, h.second, is_huffman);
             }
         } else if (from_sTable && !match && index > 0) {
             if (from_dTable) {
@@ -58,9 +58,8 @@ hpack_encode(uint8_t* buf, std::vector<header> headers, bool from_sTable, bool f
             } else {
                 len = encode_int(intRep, index, 4);
                 // memcopy
-                buf += len;
-                len = table->pack_string(buf, h.second, is_huffman);
-                buf += len;
+                cursor += len;
+                len = table->pack_string(buf+cursor, h.second, is_huffman);
             }
         } else {
             uint8_t prefix = 0x00; // if buf is initialized by ZERO, no need.
@@ -68,14 +67,14 @@ hpack_encode(uint8_t* buf, std::vector<header> headers, bool from_sTable, bool f
                 prefix = 0x40;
                 table->add_header(h);
             }
-            *(buf++) = prefix;
-            len = table->pack_string(buf, h.first, is_huffman);
-            buf += len;
-            len = table->pack_string(buf, h.second, is_huffman);
-            buf += len;
+            *(buf+(cursor++)) = prefix;
+            len = table->pack_string(buf+cursor, h.first, is_huffman);
+            cursor += len;
+            len = table->pack_string(buf+cursor, h.second, is_huffman);
         }
+        cursor += len;
     }
-    return 0;
+    return cursor;
 }
 
 
