@@ -185,25 +185,26 @@ Table::pack_string(uint8_t* buf, std::string content, bool to_huffman) {
             }
             return 1;
         }
-
-    uint8_t intRep[100];
-    int64_t len;
+    int64_t length;
+    uint8_t mask = 0;
+    uint8_t encoded[100];
     if (to_huffman) {
-        // int64_t length = huffman_encode(encoded, content);
-        // len = encode_int(intRep, length, 7);
-        intRep[0] |= 0x80;
-        // memcopy
-        buf += len;
-        // memcopy
-        //buf += length;
+        mask = 0x80;
+        length = this->huffman->encode(encoded, content);
     } else {
-        len = encode_int(intRep, content.length(), 7);
-        buf += len;
-        // memcopy
-        len += content.length();
-        buf += content.length();
+        length = content.length();
+        for (int i = 0; i < length; i++) {
+            encoded[i] = (uint8_t)content[i];
+        }
     }
-    return len;
+    int64_t len;
+    uint8_t intRep[100];
+    len = encode_int(intRep, length, 7);
+    intRep[0] |= mask;
+    // memcopy intRep
+    // memcopy encoded
+
+    return len+length;
 }
 
 
