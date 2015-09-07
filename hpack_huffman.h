@@ -12,7 +12,7 @@ typedef struct {
 
 struct Node {
     Node(Node* lp, Node* rp, uint32_t c) : left(lp), right(rp), code(c) {};
-    ~Node();
+    ~Node() {};
     Node *left, *right;
     uint32_t code;
 };
