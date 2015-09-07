@@ -308,15 +308,12 @@ HuffmanTree::~HuffmanTree() {
 
 int64_t
 HuffmanTree::encode(uint8_t* buf, std::string content) {
-    uint8_t *stringTmp = new uint8_t[content.length()+1];
-    strcpy(stringTmp, content.c_str()); // danger?
-
     std::vector<uint8_t> buftmp; // vector has len or size?
     uint64_t len = 0;
     uint8_t tmp = 0;
     uint8_t bufRest = 8;
     for (int i = 0; i < content.length(); i++) {
-        huffman_code huff = HUFFMAN_TABLE[stringTmp[i]];
+        huffman_code huff = HUFFMAN_TABLE[(uint8_t)content[i]];
         while (huff.bitLen > 0) {
             if (huff.bitLen < bufRest) {
                 bufRest -= huff.bitLen;
@@ -346,7 +343,6 @@ HuffmanTree::encode(uint8_t* buf, std::string content) {
         *(buf+i) = buftmp[i];
     }
 
-    delete [] stringTmp;
     return len;
 }
 
