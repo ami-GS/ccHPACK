@@ -20,9 +20,7 @@ class Table {
     uint32_t entry_num;
     uint32_t dynamic_table_size;
 public:
-    Table(): entry_size(0), entry_num(0), dynamic_table_size(4096) {
-        huffman = new HuffmanTree();
-    };
+    Table();
     ~Table();
     bool find_header(int &index, const header h);
     void delete_last_entry();

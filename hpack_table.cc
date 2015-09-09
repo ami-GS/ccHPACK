@@ -70,6 +70,13 @@ static const header STATIC_TABLE[] = {
 
 static const uint8_t STATIC_TABLE_NUM = 62;
 
+Table::Table() {
+    entry_size = 0;
+    entry_num = 0;
+    dynamic_table_size = 4096;
+    huffman = new HuffmanTree();
+}
+
 Table::~Table() {
     delete this->huffman;
 }
