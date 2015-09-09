@@ -24,7 +24,7 @@ public:
     HuffmanTree();
     ~HuffmanTree(); // delete alocated tree
     int64_t encode(uint8_t* buf, std::string content);
-    std::string decode(uint8_t* buf, uint32_t len);
+    std::string decode(const uint8_t* buf, uint32_t len);
 };
 
 #endif // HPACK_HUFFMAN_H_

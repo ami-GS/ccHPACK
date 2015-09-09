@@ -80,7 +80,7 @@ Table::set_dynamic_table_size(uint32_t size) {
 }
 
 bool
-Table::find_header(int &index, header h) {
+Table::find_header(int &index, const header h) {
     std::string tmpName;
     bool match;
     for (int i = 0; i < STATIC_TABLE_NUM; i++) {
@@ -126,7 +126,7 @@ Table::delete_last_entry() {
 }
 
 void
-Table::add_header(header h) {
+Table::add_header(const header h) {
     uint32_t size = h.first.length() + h.second.length();
     while (entry_size + size > dynamic_table_size) {
         this->delete_last_entry();
@@ -162,7 +162,7 @@ Table::get_header(uint32_t index) {
 }
 
 std::string
-Table::parse_string(uint8_t* buf) {
+Table::parse_string(const uint8_t* buf) {
     std::string content;
     uint32_t dst = decode_int(buf, 7);
     if ((*buf & 0x80) > 0) {
@@ -176,7 +176,7 @@ Table::parse_string(uint8_t* buf) {
 }
 
 int64_t
-Table::pack_string(uint8_t* buf, std::string content, bool to_huffman) {
+Table::pack_string(uint8_t* buf, const std::string content, bool to_huffman) {
     int64_t length;
     uint8_t mask = 0;
     uint8_t encoded[100];
@@ -201,7 +201,7 @@ Table::pack_string(uint8_t* buf, std::string content, bool to_huffman) {
 
 
 header
-Table::parse_header(uint32_t index, uint8_t* buf, bool isIndexed) {
+Table::parse_header(uint32_t index, const uint8_t* buf, bool isIndexed) {
     header h;
     std::string val_tmp;
     if (!isIndexed) {

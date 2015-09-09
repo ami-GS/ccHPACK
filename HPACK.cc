@@ -24,7 +24,7 @@ encode_int(uint8_t* dst, uint32_t I, uint8_t N) {
 }
 
 int64_t
-hpack_encode(uint8_t* buf, std::vector<header> headers, bool from_sTable, bool from_dTable, bool is_huffman, Table* table, int dynamic_table_size) {
+hpack_encode(uint8_t* buf, const std::vector<header> headers, bool from_sTable, bool from_dTable, bool is_huffman, Table* table, int dynamic_table_size) {
     int64_t len;
     int64_t cursor;
     uint8_t intRep[100];
@@ -79,7 +79,7 @@ hpack_encode(uint8_t* buf, std::vector<header> headers, bool from_sTable, bool f
 
 
 uint32_t
-decode_int(uint8_t* buf, uint8_t N) {
+decode_int(const uint8_t* buf, uint8_t N) {
     uint32_t I = *buf & ((1 << N) - 1);
     if (I == (1 << N) -1) {
         int M = 0;
