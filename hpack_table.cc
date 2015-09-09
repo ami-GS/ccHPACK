@@ -153,7 +153,7 @@ Table::add_header(const header h) {
     entry_size += size;
 }
 
-header // temporally
+header
 Table::get_header(uint32_t index) {
     if (0 < index && index < STATIC_TABLE_NUM) {
         return STATIC_TABLE[index];
@@ -164,8 +164,8 @@ Table::get_header(uint32_t index) {
         }
         return ring->h;
     }
-    header h; // temporally
-    return h;
+
+    return header(NULL, NULL); // error
 }
 
 std::string
@@ -173,7 +173,7 @@ Table::parse_string(const uint8_t* buf) {
     std::string content;
     uint32_t dst = decode_int(buf, 7);
     if ((*buf & 0x80) > 0) {
-        content = "";// huffman decoding
+        content = this->huffman->decode(buf, dst);
     } else {
         for (int i = 0; i < dst; i++) {
             content += (char)(*(buf++));
