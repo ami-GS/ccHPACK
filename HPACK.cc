@@ -26,13 +26,13 @@ encode_int(uint8_t* dst, uint32_t I, uint8_t N) {
 int64_t
 hpack_encode(uint8_t* buf, const std::vector<header> headers, bool from_sTable, bool from_dTable, bool is_huffman, Table* table, int dynamic_table_size) {
     int64_t len;
-    int64_t cursor;
+    int64_t cursor = 0;
     uint8_t intRep[100];
     if (dynamic_table_size != -1) {
         uint8_t d_table_size[100];
         len = encode_int(d_table_size, dynamic_table_size, 5);
         *d_table_size |= 0x20;
-        // memcopy
+        memcpy(buf, d_table_size, len);
         cursor += len;
     }
     for (header h : headers) {
@@ -42,10 +42,10 @@ hpack_encode(uint8_t* buf, const std::vector<header> headers, bool from_sTable, 
             if (from_dTable) {
                 len = encode_int(intRep, index, 7);
                 *intRep |= 0x80;
-                // memcopy
+                memcpy(buf+cursor, intRep, len);
             } else {
                 len = encode_int(intRep, index, 4);
-                // memcopy
+                memcpy(buf+cursor, intRep, len);
                 cursor += len;
                 len = table->pack_string(buf+cursor, h.second, is_huffman);
             }
@@ -53,11 +53,11 @@ hpack_encode(uint8_t* buf, const std::vector<header> headers, bool from_sTable, 
             if (from_dTable) {
                 len = encode_int(intRep, index, 6);
                 *intRep |= 0x40;
-                // memcopy
+                memcpy(buf+cursor, intRep, len);
                 table->add_header(h);
             } else {
                 len = encode_int(intRep, index, 4);
-                // memcopy
+                memcpy(buf+cursor, intRep, len);
                 cursor += len;
                 len = table->pack_string(buf+cursor, h.second, is_huffman);
             }

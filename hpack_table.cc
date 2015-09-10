@@ -200,8 +200,8 @@ Table::pack_string(uint8_t* buf, const std::string content, bool to_huffman) {
     uint8_t intRep[100];
     len = encode_int(intRep, length, 7);
     intRep[0] |= mask;
-    // memcopy intRep
-    // memcopy encoded
+    memcpy(buf, intRep, len);
+    memcpy(buf+len, encoded, length);
 
     return len+length;
 }
