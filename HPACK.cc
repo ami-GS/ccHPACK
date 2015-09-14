@@ -1,8 +1,6 @@
 #include <stdint.h>
-#include <vector>
 #include <string>
 #include "HPACK.h"
-#include "hpack_table.h"
 
 int64_t
 encode_int(uint8_t* dst, uint32_t I, uint8_t N) {

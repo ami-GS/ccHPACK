@@ -1,5 +1,5 @@
 #include "hpack_huffman.h"
-#include "vector"
+#include <vector>
 
 static const huffman_code HUFFMAN_TABLE[] = {
 	{0x1ff8, 13},
