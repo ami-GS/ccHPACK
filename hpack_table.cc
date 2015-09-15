@@ -117,10 +117,9 @@ Table::find_header(int &index, const header h) {
     }
     if (index > 0) {
         return match;
-    } else {
-        index = -1;
-        return false;
     }
+    index = -1;
+    return false;
 }
 
 void
