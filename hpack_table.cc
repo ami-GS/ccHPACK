@@ -185,7 +185,7 @@ int64_t
 Table::pack_string(uint8_t* buf, const std::string content, bool to_huffman) {
     int64_t length;
     uint8_t mask = 0;
-    uint8_t encoded[100];
+    uint8_t encoded[2000]; // should be optimized
     if (to_huffman) {
         mask = 0x80;
         length = this->huffman->encode(encoded, content);
