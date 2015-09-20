@@ -43,16 +43,17 @@ const static std::string TestCases[] = {
 };
 
 TEST(encodeTest, NormalTest) {
+    std::string out_tmp_file = "filename.txt";
     for (std::string testcase : TestCases) {
-        std::string call_str = "ls " + testcase + " > filename.txt";
+        std::string call_str = "ls " + testcase + " > " + out_tmp_file;
         int len = testcase.length();
         char* call = new char[len+1];
         memcpy(call, call_str.c_str(), len+1);
         system(call);
         delete [] call;
-        std::ifstream fnames("filename.txt");
+        std::ifstream fnames(out_tmp_file);
         if (fnames.fail()) {
-            std::cerr  << "fail to open filename.txt" << std::endl;
+            std::cerr  << "fail to open" << out_tmp_file << std::endl;
         }
         std::string field;
         std::vector<std::string> jsons;
