@@ -114,13 +114,20 @@ wire2byte(uint8_t *wire_byte, const std::string wire) {
     return true;
 }
 
+void
+detect_testcase_type(bool &from_header, bool &from_static,
+                     bool &is_huffman,const std::string testcase) {
+    from_header = std::string::npos != testcase.find("linear", 0);
+    from_static = from_header || std::string::npos != testcase.find("static", 0);
+    is_huffman = std::string::npos != testcase.find("huffman", 0);
+}
+
 TEST(encodeTest, NormalTest) {
     for (const std::string testcase : TestCases) {
         std::vector<std::string> jsons = read_json_files(testcase);
 
-        bool from_header = std::string::npos != testcase.find("linear", 0);
-        bool from_static = from_header || std::string::npos != testcase.find("static", 0);
-        bool is_huffman = std::string::npos != testcase.find("huffman", 0);
+        bool from_header, from_static, is_huffman;
+        detect_testcase_type(from_header, from_static, is_huffman, testcase);
         std::cout << testcase << " " << from_header << from_static << is_huffman << std::endl;
 
         Table* table = new Table();
