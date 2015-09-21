@@ -50,7 +50,7 @@ const static std::string TestCases[] = {
 const static std::string out_tmp_file = "filename.txt";
 
 std::vector<std::string>
-read_json_files(std::string testcase) {
+read_json_files(const std::string testcase) {
     std::string call_str = "ls " + testcase + " > " + out_tmp_file;
     int len = testcase.length();
     char* call = new char[len+1];
@@ -70,7 +70,7 @@ read_json_files(std::string testcase) {
 }
 
 bool
-read_json_as_pico(picojson::value& v, std::string path) {
+read_json_as_pico(picojson::value& v, const std::string path) {
     std::ifstream ifs(path);
 
     if (ifs.fail()) {
@@ -115,7 +115,7 @@ wire2byte(uint8_t *wire_byte, const std::string wire) {
 }
 
 TEST(encodeTest, NormalTest) {
-    for (std::string testcase : TestCases) {
+    for (const std::string testcase : TestCases) {
         std::vector<std::string> jsons = read_json_files(testcase);
 
         bool from_header = std::string::npos != testcase.find("linear", 0);
