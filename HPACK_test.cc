@@ -40,6 +40,11 @@ TEST(decode_intTest, NormalTest) {
 
 const static std::string TestCases[] = {
     "hpack-test-case/haskell-http2-naive/",
+    "hpack-test-case/haskell-http2-naive-huffman/",
+    "hpack-test-case/haskell-http2-static/",
+    "hpack-test-case/haskell-http2-static-huffman/",
+    "hpack-test-case/haskell-http2-linear/",
+    "hpack-test-case/haskell-http2-linear-huffman/",
 };
 
 TEST(encodeTest, NormalTest) {
@@ -60,6 +65,12 @@ TEST(encodeTest, NormalTest) {
         while (std::getline(fnames, field)) {
             jsons.push_back(field);
         }
+
+        bool from_header = std::string::npos != testcase.find("linear", 0);
+        bool from_static = from_header || std::string::npos != testcase.find("static", 0);
+        bool is_huffman = std::string::npos != testcase.find("huffman", 0);
+        std::cout << testcase << " " << from_header << from_static << is_huffman << std::endl;
+
         Table* table = new Table();
         for (std::string json_file : jsons) {
             std::string path = testcase + json_file;
@@ -92,8 +103,9 @@ TEST(encodeTest, NormalTest) {
                     picojson::object::iterator it = content.begin();
                     ans_headers.push_back(header(it->first, it->second.to_str()));
                 }
-                uint8_t dst[2000];
-                int64_t len = hpack_encode(dst, ans_headers, false, false, false, table, -1);
+                uint8_t dst[20000];
+                int64_t len = hpack_encode(dst, ans_headers,from_static,
+                                           from_header, is_huffman, table, -1);
                 uint8_t *wire_byte = new uint8_t[wire.length()/2];
                 for (int i = 0; i < wire.length(); i += 2) {
                     char tmp_c[3];
@@ -103,7 +115,8 @@ TEST(encodeTest, NormalTest) {
                     *(wire_byte+i/2) = (uint8_t)std::stoi(tmp_s, nullptr, 16);
                 }
 
-                //EXPECT_TRUE(0 == std::memcmp(dst, wire_byte, len));
+                EXPECT_EQ(wire.length()/2, len);
+                EXPECT_TRUE(0 == std::memcmp(dst, wire_byte, len));
                 delete [] wire_byte;
             }
         }
