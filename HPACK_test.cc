@@ -104,12 +104,9 @@ read_header_wire(std::vector<header>& ans_headers, std::string& wire, picojson::
 
 bool
 wire2byte(uint8_t *wire_byte, const std::string wire) {
-    for (int i = 0; i < wire.length(); i += 2) {
-        char tmp_c[3];
-        wire.copy(tmp_c, 2, i);
-        tmp_c[2] = '\0';
-        std::string tmp_s = std::string(tmp_c);
-        *(wire_byte+i/2) = (uint8_t)std::stoi(tmp_s, nullptr, 16);
+    int len = wire.length();
+    for (int i = 0; i < len; i += 2) {
+        *(wire_byte+i/2) = (uint8_t)std::stoi(wire.substr(i, 2).c_str(), nullptr, 16);
     }
     return true;
 }
