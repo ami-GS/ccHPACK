@@ -49,24 +49,25 @@ const static std::string TestCases[] = {
 
 const static std::string out_tmp_file = "filename.txt";
 
-std::vector<std::string>
-read_json_files(const std::string testcase) {
+bool
+read_json_files(std::vector<std::string> &jsons, const std::string testcase) {
     std::string call_str = "ls " + testcase + " > " + out_tmp_file;
     int len = testcase.length();
-    char* call = new char[len+1];
+    char call[50];
     memcpy(call, call_str.c_str(), len+1);
     system(call);
-    delete [] call;
     std::ifstream fnames(out_tmp_file);
     if (fnames.fail()) {
         std::cerr  << "fail to open" << out_tmp_file << std::endl;
+        return false;
     }
+
     std::string field;
-    std::vector<std::string> jsons;
     while (std::getline(fnames, field)) {
         jsons.push_back(field);
     }
-    return jsons;
+
+    return true;
 }
 
 bool
@@ -121,7 +122,10 @@ detect_testcase_type(bool &from_header, bool &from_static,
 
 TEST(encodeTest, NormalTest) {
     for (const std::string testcase : TestCases) {
-        std::vector<std::string> jsons = read_json_files(testcase);
+        std::vector<std::string> jsons;
+        bool err = read_json_files(jsons, testcase);
+        if (!err) {
+        }
 
         bool from_header, from_static, is_huffman;
         detect_testcase_type(from_header, from_static, is_huffman, testcase);
@@ -130,7 +134,7 @@ TEST(encodeTest, NormalTest) {
         Table* table = new Table();
         for (std::string json_file : jsons) {
             picojson::value v;
-            bool err = read_json_as_pico(v, testcase + json_file);
+            err = read_json_as_pico(v, testcase + json_file);
             if (!err) {
             }
 
