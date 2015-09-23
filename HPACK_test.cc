@@ -159,6 +159,8 @@ TEST(encodeTest, NormalTest) {
 
                 EXPECT_EQ(wire.length()/2, len);
                 EXPECT_TRUE(0 == std::memcmp(dst, wire_byte, len));
+                ASSERT_EQ(wire.length()/2, len);
+                ASSERT_TRUE(0 == wire_assert);
                 delete [] wire_byte;
             }
         }
