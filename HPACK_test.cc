@@ -120,6 +120,20 @@ detect_testcase_type(bool &from_header, bool &from_static,
     is_huffman = std::string::npos != testcase.find("huffman", 0);
 }
 
+void
+print_wire_byte(const uint8_t* expect, uint64_t e_len, const uint8_t* actual, uint64_t a_len) {
+    std::cout << "Expect" << std::endl;
+    for (int i = 0; i < e_len; i++) {
+        printf("%x", *(expect+i));
+    }
+    std::cout << std::endl;
+    std::cout << "Actual" << std::endl;
+    for (int i = 0; i < a_len; i++) {
+        printf("%x", *(actual+i));
+    }
+    std::cout << std::endl << std::endl;
+}
+
 TEST(encodeTest, NormalTest) {
     for (const std::string testcase : TestCases) {
         std::vector<std::string> jsons;
@@ -140,8 +154,8 @@ TEST(encodeTest, NormalTest) {
 
             picojson::object obj = v.get<picojson::object>();
             picojson::array arr = obj["cases"].get<picojson::array>();
-            picojson::array::iterator it_seqno;
-            for (it_seqno = arr.begin(); it_seqno != arr.end(); it_seqno++) {
+            picojson::array::iterator it_seqno = arr.begin();
+            for (int seqno; it_seqno != arr.end(); seqno++, it_seqno++) {
                 std::string wire;
                 std::vector<header> ans_headers;
                 err = read_header_wire(ans_headers, wire, it_seqno);
@@ -157,8 +171,11 @@ TEST(encodeTest, NormalTest) {
                 if (!err) {
                 }
 
-                EXPECT_EQ(wire.length()/2, len);
-                EXPECT_TRUE(0 == std::memcmp(dst, wire_byte, len));
+                int wire_assert = std::memcmp(dst, wire_byte, len);
+                if (wire_assert != 0) {
+                    std::cout << testcase << json_file << "  seqno: " << seqno << std::endl;
+                    print_wire_byte(wire_byte, wire.length()/2, dst, len);
+                }
                 ASSERT_EQ(wire.length()/2, len);
                 ASSERT_TRUE(0 == wire_assert);
                 delete [] wire_byte;
