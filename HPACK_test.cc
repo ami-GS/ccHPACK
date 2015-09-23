@@ -52,8 +52,8 @@ const static std::string out_tmp_file = "filename.txt";
 bool
 read_json_files(std::vector<std::string> &jsons, const std::string testcase) {
     std::string call_str = "ls " + testcase + " > " + out_tmp_file;
-    int len = testcase.length();
-    char call[50];
+    int len = call_str.length();
+    char call[70];
     memcpy(call, call_str.c_str(), len+1);
     system(call);
     std::ifstream fnames(out_tmp_file);
