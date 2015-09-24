@@ -124,12 +124,12 @@ void
 print_wire_byte(const uint8_t* expect, uint64_t e_len, const uint8_t* actual, uint64_t a_len) {
     std::cout << "Expect" << std::endl;
     for (int i = 0; i < e_len; i++) {
-        printf("%x", *(expect+i));
+        printf("%02x", *(expect+i));
     }
     std::cout << std::endl;
     std::cout << "Actual" << std::endl;
     for (int i = 0; i < a_len; i++) {
-        printf("%x", *(actual+i));
+        printf("%02x", *(actual+i));
     }
     std::cout << std::endl << std::endl;
 }
