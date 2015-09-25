@@ -52,13 +52,14 @@ hpack_encode(uint8_t* buf, const std::vector<header> headers, bool from_sTable, 
                 len = encode_int(intRep, index, 6);
                 *intRep |= 0x40;
                 memcpy(buf+cursor, intRep, len);
+                cursor += len;
                 table->add_header(h);
             } else {
                 len = encode_int(intRep, index, 4);
                 memcpy(buf+cursor, intRep, len);
                 cursor += len;
-                len = table->pack_string(buf+cursor, h.second, is_huffman);
             }
+            len = table->pack_string(buf+cursor, h.second, is_huffman);
         } else {
             uint8_t prefix = 0x00; // if buf is initialized by ZERO, no need.
             if (from_dTable) {
