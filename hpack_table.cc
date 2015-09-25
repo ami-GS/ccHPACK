@@ -89,8 +89,8 @@ Table::set_dynamic_table_size(uint32_t size) {
 bool
 Table::find_header(int &index, const header h) {
     std::string tmpName;
-    bool match;
-    for (int i = 0; i < STATIC_TABLE_NUM; i++) {
+    bool match = false;
+    for (int i = 1; i < STATIC_TABLE_NUM; i++) {
         header s_header = STATIC_TABLE[i];
         if (s_header.first == h.first && s_header.second == h.second) {
             index = i;

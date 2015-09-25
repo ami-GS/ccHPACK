@@ -34,7 +34,7 @@ hpack_encode(uint8_t* buf, const std::vector<header> headers, bool from_sTable, 
         cursor += len;
     }
     for (header h : headers) {
-        int index;
+        int index = 0;
         bool match = table->find_header(index, h);
         if (from_sTable && match) {
             if (from_dTable) {
