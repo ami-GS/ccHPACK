@@ -155,7 +155,7 @@ TEST(encodeTest, NormalTest) {
             picojson::object obj = v.get<picojson::object>();
             picojson::array arr = obj["cases"].get<picojson::array>();
             picojson::array::iterator it_seqno = arr.begin();
-            for (int seqno; it_seqno != arr.end(); seqno++, it_seqno++) {
+            for (int seqno = 0; it_seqno != arr.end(); seqno++, it_seqno++) {
                 std::string wire;
                 std::vector<header> ans_headers;
                 err = read_header_wire(ans_headers, wire, it_seqno);
