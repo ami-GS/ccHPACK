@@ -308,8 +308,7 @@ HuffmanTree::~HuffmanTree() {
 
 int64_t
 HuffmanTree::encode(uint8_t* buf, std::string content) {
-    std::vector<uint8_t> buftmp; // vector has len or size?
-    uint64_t len = 0;
+    std::vector<uint8_t> buftmp;
     uint8_t tmp = 0;
     uint8_t bufRest = 8;
     for (int i = 0; i < content.length(); i++) {
@@ -327,7 +326,6 @@ HuffmanTree::encode(uint8_t* buf, std::string content) {
                 huff.code = huff.code & ((1 << shift) - 1);
             }
             if (bufRest == 0) {
-                len++;
                 buftmp.push_back(tmp);
                 bufRest = 8;
                 tmp = 0;
@@ -337,13 +335,12 @@ HuffmanTree::encode(uint8_t* buf, std::string content) {
     if (bufRest > 0 && bufRest > 8) {
         tmp |= ((1 << bufRest) - 1);
         buftmp.push_back(tmp);
-        len++;
     }
-    for (int i = 0; i < len; i++) { // I would like to use extended for
+    for (int i = 0; i < buftmp.size(); i++) { // I would like to use extended for
         *(buf+i) = buftmp[i];
     }
 
-    return len;
+    return ((int64_t)buftmp.size());
 }
 
 std::string
