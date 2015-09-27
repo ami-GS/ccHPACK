@@ -121,7 +121,7 @@ detect_testcase_type(bool &from_header, bool &from_static,
 }
 
 void
-print_wire_byte(const uint8_t* expect, uint64_t e_len, const uint8_t* actual, uint64_t a_len) {
+print_wires(const uint8_t* expect, uint64_t e_len, const uint8_t* actual, uint64_t a_len) {
     std::cout << "Expect" << std::endl;
     for (int i = 0; i < e_len; i++) {
         printf("%02x", *(expect+i));
@@ -145,7 +145,8 @@ TEST(encodeTest, NormalTest) {
         detect_testcase_type(from_header, from_static, is_huffman, testcase);
         std::cout << testcase << " " << from_header << from_static << is_huffman << std::endl;
 
-        Table* table = new Table();
+        Table* encode_table = new Table();
+        Table* decode_table = new Table();
         for (std::string json_file : jsons) {
             picojson::value v;
             err = read_json_as_pico(v, testcase + json_file);
@@ -157,31 +158,44 @@ TEST(encodeTest, NormalTest) {
             picojson::array::iterator it_seqno = arr.begin();
             for (int seqno = 0; it_seqno != arr.end(); seqno++, it_seqno++) {
                 std::string wire;
-                std::vector<header> ans_headers;
-                err = read_header_wire(ans_headers, wire, it_seqno);
+                std::vector<header> expect_headers;
+                err = read_header_wire(expect_headers, wire, it_seqno);
+                if (!err) {
+                }
+                uint8_t *expect_wire = new uint8_t[wire.length()/2];
+                err = wire2byte(expect_wire, wire);
+                if (*expect_wire == 0x0e) {
+                    *expect_wire = 0x08;
+                }
                 if (!err) {
                 }
 
-                uint8_t dst[20000];
-                int64_t len = hpack_encode(dst, ans_headers,from_static,
-                                           from_header, is_huffman, table, -1);
+                uint8_t actual_wire[20000];
+                int64_t len = hpack_encode(actual_wire, expect_headers, from_static,
+                                           from_header, is_huffman, encode_table, -1);
 
-                uint8_t *wire_byte = new uint8_t[wire.length()/2];
-                err = wire2byte(wire_byte, wire);
-                if (!err) {
-                }
-
-                int wire_assert = std::memcmp(dst, wire_byte, len);
+                int wire_assert = std::memcmp(actual_wire, expect_wire, len);
                 if (wire_assert != 0) {
                     std::cout << testcase << json_file << "  seqno: " << seqno << std::endl;
-                    print_wire_byte(wire_byte, wire.length()/2, dst, len);
+                    print_wires(expect_wire, wire.length()/2, actual_wire, len);
+                    for (header head : expect_headers) {
+                        std::cout << head.first << " " << head.second << std::endl;
+                    }
                 }
                 ASSERT_EQ(wire.length()/2, len);
                 ASSERT_TRUE(0 == wire_assert);
-                delete [] wire_byte;
+
+                std::vector<header> actual_headers = hpack_decode(expect_wire, decode_table);
+                ASSERT_EQ(actual_headers.size(), expect_headers.size());
+                for (int i = 0; i < actual_headers.size(); i++) {
+                    ASSERT_TRUE(actual_headers[i] == expect_headers[i]);
+                }
+
+                delete [] expect_wire;
             }
         }
-        delete table;
+        delete encode_table;
+        delete decode_table;
     }
 }
 
