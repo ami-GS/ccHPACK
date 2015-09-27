@@ -332,7 +332,7 @@ HuffmanTree::encode(uint8_t* buf, std::string content) {
             }
         }
     }
-    if (bufRest > 0 && bufRest > 8) {
+    if (bufRest > 0 && bufRest < 8) {
         tmp |= ((1 << bufRest) - 1);
         *(buf+(len++)) = tmp;
     }
