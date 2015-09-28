@@ -94,7 +94,7 @@ decode_int(const uint8_t* buf, uint8_t N) {
 std::vector< header >
 hpack_decode(uint8_t* buf, Table* table) {
     std::vector< header > headers;
-    while (*buf != '\0') {
+    while (buf+cursor != (uint8_t*)NULL) {
         bool isIndexed = 0;
         uint32_t index;
         if ((*buf & 0xe0) == 0x20) {
