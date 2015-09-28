@@ -34,8 +34,10 @@ TEST(decode_intTest, NormalTest) {
         {0x01, 0x00},
         {0x0f, 0x01},
     };
-    EXPECT_EQ(1, decode_int(data[0], 1));
-    EXPECT_EQ(16, decode_int(data[1], 4));
+    EXPECT_EQ(2, decode_int(dst, data[0], 1));
+    EXPECT_EQ(1, dst);
+    EXPECT_EQ(2, decode_int(dst, data[1], 4));
+    EXPECT_EQ(16, dst);
 }
 
 const static std::string TestCases[] = {

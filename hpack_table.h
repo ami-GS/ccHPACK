@@ -26,10 +26,10 @@ public:
     void delete_last_entry();
     void add_header(const header h);
     void set_dynamic_table_size(uint32_t size);
-    std::string parse_string(const uint8_t* buf);
+    int64_t parse_string(std::string &dst, const uint8_t* buf);
     int64_t pack_string(uint8_t* buf, const std::string content, bool to_huffman);
     header get_header(uint32_t index);
-    header parse_header(uint32_t index, const uint8_t* buf, bool isIndexed);
+    int64_t parse_header(header &dst, uint32_t index, const uint8_t* buf, bool isIndexed);
 };
 
 #endif // HPACK_TABLE_H_

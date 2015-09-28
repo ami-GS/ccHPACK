@@ -77,29 +77,34 @@ hpack_encode(uint8_t* buf, const std::vector<header> headers, bool from_sTable, 
 }
 
 
-uint32_t
-decode_int(const uint8_t* buf, uint8_t N) {
-    uint32_t I = *buf & ((1 << N) - 1);
-    if (I == (1 << N) -1) {
+int64_t
+decode_int(uint32_t &dst, const uint8_t* buf, uint8_t N) {
+    int64_t len = 1;
+    dst = *buf & ((1 << N) - 1);
+    if (dst == (1 << N) -1) {
         int M = 0;
         do {
-            I += (*(++buf) & 0x7f) << M;            
+            dst += (*(buf+(len++)) & 0x7f) << M;
             M += 7;
         }
         while (*buf & 0x80);
     }
-    return I;
+    return len;
 }
 
 std::vector< header >
 hpack_decode(uint8_t* buf, Table* table) {
     std::vector< header > headers;
+    int64_t cursor = 0;
     while (buf+cursor != (uint8_t*)NULL) {
         bool isIndexed = 0;
         uint32_t index;
-        if ((*buf & 0xe0) == 0x20) {
+        int64_t len = 0;
+        if ((*(buf+cursor) & 0xe0) == 0x20) {
             // 7/3 Header table Size Update
-            uint32_t dst = decode_int(buf, 5);
+            uint32_t dst;
+            len = decode_int(dst, (buf+cursor), 5);
+            cursor += len;
             table->set_dynamic_table_size(dst);
         }
 
@@ -123,8 +128,11 @@ hpack_decode(uint8_t* buf, Table* table) {
                 nLen = 4;
             }
         }
-        index = decode_int(++buf, nLen);
-        header h = table->parse_header(index, buf, isIndexed);
+        len = decode_int(index, buf+cursor, nLen);
+        cursor += len;
+        header h;
+        len = table->parse_header(h, index, buf+cursor, isIndexed);
+        cursor += len;
         if (nLen == 6) {
             table->add_header(h);
         }
