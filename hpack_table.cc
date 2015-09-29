@@ -209,18 +209,18 @@ Table::pack_string(uint8_t* buf, const std::string content, bool to_huffman) {
 int64_t
 Table::parse_header(header &dst, uint32_t index, const uint8_t* buf, bool isIndexed) {
     int64_t len = 0;
-    std::string val_tmp;
     if (!isIndexed) {
         if (index == 0) {
             len = this->parse_string(dst.first, buf);
         }
-        len += this->parse_string(val_tmp, buf+len);
+        len += this->parse_string(dst.second, buf+len);
     }
     
     if (index > 0) {
-        dst = this->get_header(index);
-        if (val_tmp.length() > 0) {
-            dst.second = val_tmp;
+        header h = this->get_header(index);
+        dst.first = h.first;
+        if (dst.second.length() == 0) {
+            dst.second = h.second;
         }
     }
     return len;
