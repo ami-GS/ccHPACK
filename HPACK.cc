@@ -45,6 +45,7 @@ hpack_encode(uint8_t* buf, const std::vector<header> headers, bool from_sTable, 
                 len = encode_int(intRep, index, 4);
                 memcpy(buf+cursor, intRep, len);
                 cursor += len;
+                memcpy(buf+cursor, intRep, len);
                 len = table->pack_string(buf+cursor, h.second, is_huffman);
             }
         } else if (from_sTable && !match && index > 0) {
@@ -87,17 +88,17 @@ decode_int(uint32_t &dst, const uint8_t* buf, uint8_t N) {
             dst += (*(buf+(len++)) & 0x7f) << M;
             M += 7;
         }
-        while (*buf & 0x80);
+        while (*(buf+len) & 0x80);
     }
     return len;
 }
 
 std::vector< header >
-hpack_decode(uint8_t* buf, Table* table) {
+hpack_decode(uint8_t* buf, Table* table, uint32_t length) {
     std::vector< header > headers;
     int64_t cursor = 0;
-    while (buf+cursor != (uint8_t*)NULL) {
-        bool isIndexed = 0;
+    while (cursor < length) {
+        bool isIndexed = false;
         uint32_t index;
         int64_t len = 0;
         if ((*(buf+cursor) & 0xe0) == 0x20) {
@@ -109,15 +110,15 @@ hpack_decode(uint8_t* buf, Table* table) {
         }
 
         uint8_t nLen = 0;
-        if ((*buf & 0x80) > 0)  {
+        if ((*(buf+cursor) & 0x80) > 0)  {
             // 7.1 Indexwd Header Field
-            if ((*buf & 0x7f) == 0) {
+            if ((*(buf+cursor) & 0x7f) == 0) {
                 // error
             }
             nLen = 7;
             isIndexed = true;
         } else {
-            if ((*buf & 0xc0) == 0x40) {
+            if ((*(buf+cursor) & 0xc0) == 0x40) {
                 // 7.2.1 Literal Header Field with Incremental Indexing
                 nLen = 6;
             } else {

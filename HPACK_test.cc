@@ -187,7 +187,7 @@ TEST(encodeTest, NormalTest) {
                 ASSERT_EQ(wire.length()/2, len);
                 ASSERT_TRUE(0 == wire_assert);
 
-                std::vector<header> actual_headers = hpack_decode(expect_wire, decode_table);
+                std::vector<header> actual_headers = hpack_decode(expect_wire, decode_table, wire.length()/2);
                 ASSERT_EQ(actual_headers.size(), expect_headers.size());
                 for (int i = 0; i < actual_headers.size(); i++) {
                     ASSERT_TRUE(actual_headers[i] == expect_headers[i]);
