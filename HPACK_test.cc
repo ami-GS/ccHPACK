@@ -7,6 +7,7 @@
 #include <iostream>
 #include <iterator>
 
+using namespace picojson;
 
 TEST(encode_intTest, NormalTest) {
     uint8_t dst[10];
@@ -73,7 +74,7 @@ read_json_files(std::vector<std::string> &jsons, const std::string testcase) {
 }
 
 bool
-read_json_as_pico(picojson::value& v, const std::string path) {
+read_json_as_pico(value& v, const std::string path) {
     std::ifstream ifs(path);
 
     if (ifs.fail()) {
@@ -82,7 +83,7 @@ read_json_as_pico(picojson::value& v, const std::string path) {
     }
     std::string str((std::istreambuf_iterator<char>(ifs)),
                     std::istreambuf_iterator<char>());
-    std::string err = picojson::parse(v, str);
+    std::string err = parse(v, str);
     if (! err.empty()) {
         std::cerr << err << std::endl;
         return false;
@@ -91,15 +92,15 @@ read_json_as_pico(picojson::value& v, const std::string path) {
 }
 
 bool
-read_header_wire(std::vector<header>& ans_headers, std::string& wire, picojson::array::iterator it_seqno) {
-    picojson::object obj_in = it_seqno->get<picojson::object>();
+read_header_wire(std::vector<header>& ans_headers, std::string& wire, array::iterator it_seqno) {
+    object obj_in = it_seqno->get<object>();
     wire = obj_in["wire"].to_str();
-    picojson::array json_headers = obj_in["headers"].get<picojson::array>();
-    picojson::array::iterator it_headers;
+    array json_headers = obj_in["headers"].get<array>();
+    array::iterator it_headers;
 
     for (it_headers = json_headers.begin(); it_headers != json_headers.end(); it_headers++) {
-        picojson::object content = it_headers->get<picojson::object>();
-        picojson::object::iterator it = content.begin();
+        object content = it_headers->get<object>();
+        object::iterator it = content.begin();
         ans_headers.push_back(header(it->first, it->second.to_str()));
     }
     return true;
@@ -150,14 +151,14 @@ TEST(encodeTest, NormalTest) {
         Table* encode_table = new Table();
         Table* decode_table = new Table();
         for (std::string json_file : jsons) {
-            picojson::value v;
+            value v;
             err = read_json_as_pico(v, testcase + json_file);
             if (!err) {
             }
 
-            picojson::object obj = v.get<picojson::object>();
-            picojson::array arr = obj["cases"].get<picojson::array>();
-            picojson::array::iterator it_seqno = arr.begin();
+            object obj = v.get<object>();
+            array arr = obj["cases"].get<array>();
+            array::iterator it_seqno = arr.begin();
             for (int seqno = 0; it_seqno != arr.end(); seqno++, it_seqno++) {
                 std::string wire;
                 std::vector<header> expect_headers;
