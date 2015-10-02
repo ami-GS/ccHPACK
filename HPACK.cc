@@ -93,9 +93,8 @@ decode_int(uint32_t &dst, const uint8_t* buf, uint8_t N) {
     return len;
 }
 
-std::vector< header >
-hpack_decode(uint8_t* buf, Table* table, uint32_t length) {
-    std::vector< header > headers;
+int64_t
+hpack_decode(std::vector<header>& headers, uint8_t* buf, Table* table, uint32_t length) {
     int64_t cursor = 0;
     while (cursor < length) {
         bool isIndexed = false;
@@ -139,5 +138,5 @@ hpack_decode(uint8_t* buf, Table* table, uint32_t length) {
         }
         headers.push_back(h);
     }
-    return headers;
+    return cursor;
 }
