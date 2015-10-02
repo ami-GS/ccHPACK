@@ -85,11 +85,12 @@ decode_int(uint32_t &dst, const uint8_t* buf, uint8_t N) {
     if (dst == (1 << N) -1) {
         int M = 0;
         do {
-            dst += (*(buf+(len++)) & 0x7f) << M;
+            dst += (*(buf+len) & 0x7f) << M;
             M += 7;
         }
-        while (*(buf+len) & 0x80);
+        while (*(buf+(len++)) & 0x80);
     }
+
     return len;
 }
 
