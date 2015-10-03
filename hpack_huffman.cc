@@ -265,18 +265,18 @@ static const uint16_t HUFFMAN_TABLE_LEN = 257;
 
 HuffmanTree::HuffmanTree() {
     root = new Node(NULL_NODE, NULL_NODE, 0xffffffff);
-    for (uint32_t code = 0; code < HUFFMAN_TABLE_LEN; code++) {
+    for (int16_t code = 0; code < HUFFMAN_TABLE_LEN; code++) {
         Node* cursor = root;
         huffman_code huff = HUFFMAN_TABLE[code];
         for (int i = huff.bitLen; i > 0; i--) {
             if ((huff.code & (1 << (i-1))) > 0) {
                 if (cursor->right == NULL_NODE) {
-                        cursor->right = new Node(NULL_NODE, NULL_NODE, 0xffffffff);
+                        cursor->right = new Node(NULL_NODE, NULL_NODE, -1);
                     }
                 cursor = cursor->right;
             } else {
                 if (cursor->left == NULL_NODE) {
-                        cursor->left = new Node(NULL_NODE, NULL_NODE, 0xffffffff);
+                    cursor->left = new Node(NULL_NODE, NULL_NODE, -1);
                     }
                 cursor = cursor->left;
             }
@@ -340,22 +340,22 @@ HuffmanTree::encode(uint8_t* buf, std::string content) {
     return len;
 }
 
-int64_t
-HuffmanTree::decode(std::string &dst, const uint8_t* buf, uint32_t str_len) {
-    int64_t len = 0;
+std::string
+HuffmanTree::decode(const uint8_t* buf, uint32_t str_len) {
+    std::string dst;
     Node* cursor = root;
-    for (int i = 0; i < str_len; i++) {
-       for (uint8_t j = 7; j >= 0; j--) {
+    for (int16_t i = 0; i < str_len; i++) {
+       for (int8_t j = 7; j >= 0; j--) {
            if ((*(buf+i) & (1 << j)) > 0) {
                 cursor = cursor->right;
             } else {
                 cursor = cursor->left;
             }
-            if (cursor->code < 0xffffffff) {
-                dst += cursor->code; // correct?
+            if (cursor->code >= 0) {
+                dst += cursor->code;
                 cursor = root;
             }
         }
     }
-    return len;
+    return dst;
 }

@@ -14,7 +14,7 @@ struct Node {
     Node(Node* lp, Node* rp, uint32_t c) : left(lp), right(rp), code(c) {};
     ~Node() {};
     Node *left, *right;
-    uint32_t code;
+    int16_t code;
 };
 
 class HuffmanTree {
@@ -24,7 +24,7 @@ public:
     HuffmanTree();
     ~HuffmanTree(); // delete alocated tree
     int64_t encode(uint8_t* buf, std::string content);
-    int64_t decode(std::string &dst, const uint8_t* buf, uint32_t len);
+    std::string decode(const uint8_t* buf, uint32_t len);
 };
 
 #endif // HPACK_HUFFMAN_H_
