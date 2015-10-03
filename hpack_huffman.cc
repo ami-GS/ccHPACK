@@ -346,7 +346,7 @@ HuffmanTree::decode(std::string &dst, const uint8_t* buf, uint32_t str_len) {
     Node* cursor = root;
     for (int i = 0; i < str_len; i++) {
        for (uint8_t j = 7; j >= 0; j--) {
-           if ((*(buf+(len++)) & (1 << j)) > 0) {
+           if ((*(buf+i) & (1 << j)) > 0) {
                 cursor = cursor->right;
             } else {
                 cursor = cursor->left;
