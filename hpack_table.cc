@@ -173,13 +173,12 @@ Table::parse_string(std::string &dst, const uint8_t* buf) {
     int64_t len = decode_int(str_len, buf, 7);
     if ((*buf & 0x80) > 0) {
         dst = this->huffman->decode(buf+len, str_len);
-        len += str_len;
     } else {
         for (int i = 0; i < str_len; i++) {
-            dst += (char)(*(buf+(len++)));
+            dst += (char)(*(buf+(len+i)));
         }
     }
-    return len;
+    return len + str_len;
 }
 
 int64_t
