@@ -193,7 +193,7 @@ TEST(encodeTest, NormalTest) {
                 ASSERT_EQ(cursor, wire.length()/2);
                 ASSERT_EQ(actual_headers.size(), expect_headers.size());
                 for (int i = 0; i < actual_headers.size(); i++) {
-                    ASSERT_TRUE(actual_headers[i] == expect_headers[i]);
+                    ASSERT_EQ(actual_headers[i], expect_headers[i]);
                 }
 
                 delete [] expect_wire;
