@@ -196,7 +196,7 @@ Table::pack_string(uint8_t* buf, const std::string content, bool to_huffman) {
         }
     }
     int64_t len;
-    uint8_t intRep[100];
+    uint8_t intRep[10];
     len = encode_int(intRep, length, 7);
     intRep[0] |= mask;
     memcpy(buf, intRep, len);

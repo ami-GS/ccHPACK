@@ -25,9 +25,9 @@ int64_t
 hpack_encode(uint8_t* buf, const std::vector<header> headers, bool from_sTable, bool from_dTable, bool is_huffman, Table* table, int dynamic_table_size) {
     int64_t len;
     int64_t cursor = 0;
-    uint8_t intRep[100];
+    uint8_t intRep[10];
     if (dynamic_table_size != -1) {
-        uint8_t d_table_size[100];
+        uint8_t d_table_size[10];
         len = encode_int(d_table_size, dynamic_table_size, 5);
         *d_table_size |= 0x20;
         memcpy(buf, d_table_size, len);
