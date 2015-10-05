@@ -92,8 +92,11 @@ read_json_as_pico(value& v, const std::string path) {
 }
 
 bool
-read_header_wire(std::vector<header>& ans_headers, std::string& wire, array::iterator it_seqno) {
+read_sequence(int& table_size, std::vector<header>& ans_headers, std::string& wire, array::iterator it_seqno) {
     object obj_in = it_seqno->get<object>();
+    if (obj_in["header_table_size"].to_str() != "null") {
+        table_size = (int)std::stoi(obj_in["header_table_size"].to_str());
+    }
     wire = obj_in["wire"].to_str();
     array json_headers = obj_in["headers"].get<array>();
     array::iterator it_headers;
@@ -160,9 +163,10 @@ TEST(encodeTest, NormalTest) {
             array arr = obj["cases"].get<array>();
             array::iterator it_seqno = arr.begin();
             for (int seqno = 0; it_seqno != arr.end(); seqno++, it_seqno++) {
+                int table_size = -1;
                 std::string wire;
                 std::vector<header> expect_headers;
-                err = read_header_wire(expect_headers, wire, it_seqno);
+                err = read_sequence(table_size, expect_headers, wire, it_seqno);
                 if (!err) {
                 }
                 uint8_t *expect_wire = new uint8_t[wire.length()/2];
@@ -175,7 +179,7 @@ TEST(encodeTest, NormalTest) {
 
                 uint8_t actual_wire[20000];
                 int64_t len = hpack_encode(actual_wire, expect_headers, from_static,
-                                           from_header, is_huffman, encode_table, -1);
+                                           from_header, is_huffman, encode_table, table_size);
 
                 int wire_assert = std::memcmp(actual_wire, expect_wire, len);
                 if (wire_assert != 0) {
