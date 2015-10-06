@@ -123,7 +123,11 @@ detect_testcase_type(bool &from_header, bool &from_static,
                      bool &is_huffman,const std::string testcase) {
     from_header = std::string::npos != testcase.find("linear", 0);
     from_static = from_header || std::string::npos != testcase.find("static", 0);
-    is_huffman = std::string::npos != testcase.find("huffman", 0);
+    if (std::string::npos != testcase.find("haskell", 0)) {
+        is_huffman = std::string::npos != testcase.find("huffman", 0);
+    } else {
+        is_huffman = true;
+    }
 }
 
 void
