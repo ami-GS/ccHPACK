@@ -26,7 +26,7 @@ hpack_encode(uint8_t* buf, const std::vector<header> headers, bool from_sTable, 
     int64_t len;
     int64_t cursor = 0;
     uint8_t intRep[10];
-    if (dynamic_table_size != -1) {
+    if (dynamic_table_size != -1 && table->dynamic_table_size != dynamic_table_size) {
         uint8_t d_table_size[10];
         len = encode_int(d_table_size, dynamic_table_size, 5);
         *d_table_size |= 0x20;

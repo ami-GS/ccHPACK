@@ -18,10 +18,10 @@ class Table {
     HuffmanTree *huffman;
     uint32_t entry_size;
     uint32_t entry_num;
-    uint32_t dynamic_table_size;
 public:
     Table();
     ~Table();
+    uint32_t dynamic_table_size;
     bool find_header(int &index, const header h);
     void delete_last_entry();
     void add_header(const header h);
