@@ -149,7 +149,7 @@ print_wires(const uint8_t* expect, uint64_t e_len, const uint8_t* actual, uint64
     std::cout << std::endl << std::endl;
 }
 
-TEST(encodeTest, NormalTest) {
+TEST(HPACKeTest, NormalTest) {
     for (const std::string testcase : TestCases) {
         std::vector<std::string> jsons;
         bool err = read_json_files(jsons, testcase);
