@@ -48,6 +48,11 @@ const static std::string TestCases[] = {
     "hpack-test-case/haskell-http2-static-huffman/",
     "hpack-test-case/haskell-http2-linear/",
     "hpack-test-case/haskell-http2-linear-huffman/",
+    "hpack-test-case/go-hpack/",
+    "hpack-test-case/nghttp2/",
+    "hpack-test-case/nghttp2-16384-4096/",
+    "hpack-test-case/nghttp2-change-table-size/",
+    "hpack-test-case/node-http2-hpack/",
 };
 
 const static std::string out_tmp_file = "filename.txt";
